@@ -1,6 +1,4 @@
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import { readFile } from "node:fs/promises";
+import { getLines } from "../util.js";
 
 const getCalibrationValue = (input: string) => {
   const digits = input.replace(/\D/g, "");
@@ -8,9 +6,11 @@ const getCalibrationValue = (input: string) => {
 };
 
 const solve = async () => {
-  const inputString = await readFile(`${dirname(fileURLToPath(import.meta.url))}/input.txt`, { encoding: "utf-8" });
-  const input = inputString.split("\n");
-  const calibrationTotal = input.reduce((sum, current) => (current ? sum + getCalibrationValue(current) : sum), 0);
+  const lines = getLines("day-1", "input.txt");
+  let calibrationTotal = 0;
+  for await (const line of lines) {
+    calibrationTotal += getCalibrationValue(line);
+  }
   console.log("Calibration Value Total:", calibrationTotal);
   return calibrationTotal;
 };
