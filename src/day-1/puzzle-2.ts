@@ -1,4 +1,4 @@
-import { getLines } from "../util.js";
+import { benchmarkSolve, getLines } from "../util.js";
 
 const digitMap = new Map<string, string>([
   ["one", "1"],
@@ -39,12 +39,14 @@ const getCalibrationValue = (input: string) => {
 
 const solve = async () => {
   const lines = getLines("day-1", "input.txt");
+
   let calibrationTotal = 0;
   for await (const line of lines) {
     calibrationTotal += getCalibrationValue(line);
   }
-  console.log("Calibration Value Total (Including Numerical Words):", calibrationTotal);
+
   return calibrationTotal;
 };
 
-export default solve;
+export default async () =>
+  benchmarkSolve("Day 1 Puzzle 2", "Calibration value total (including numerical words):", solve);

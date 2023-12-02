@@ -26,3 +26,12 @@ export async function* getLines(
 
   return null;
 }
+
+export const benchmarkSolve = async (timerLabel: string, resultLabel: string, solveFunction: () => Promise<any>) => {
+  console.time(timerLabel);
+  const result = await solveFunction();
+
+  console.timeEnd(timerLabel);
+  console.log(resultLabel, result);
+  console.log("");
+};

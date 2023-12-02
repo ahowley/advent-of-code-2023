@@ -1,14 +1,14 @@
-import { getLines } from "../util.js";
+import { benchmarkSolve, getLines } from "../util.js";
 
-type InputString = `Game ${number}:${string}`;
-type Color = "red" | "green" | "blue";
+export type InputString = `Game ${number}:${string}`;
+export type Color = "red" | "green" | "blue";
 
-type GameRound = {
+export type GameRound = {
   red: number;
   green: number;
   blue: number;
 };
-type Game = {
+export type Game = {
   id: number;
   rounds: GameRound[];
 };
@@ -19,7 +19,7 @@ const MAX_CUBES: GameRound = {
   blue: 14,
 };
 
-const parseInputToGame = (input: InputString): Game => {
+export const parseInputToGame = (input: InputString): Game => {
   const [gameString, roundsString] = input.split(": ");
   const id = parseInt(gameString.split(" ")[1]);
 
@@ -48,14 +48,13 @@ const solve = async () => {
 
   let possibleIdSum = 0;
   for await (const line of lines) {
-    const game: Game = parseInputToGame(line);
+    const game = parseInputToGame(line);
     if (game.rounds.every(isPossible)) {
       possibleIdSum += game.id;
     }
   }
 
-  console.log("Sum of Game IDs where quantities are possible:", possibleIdSum);
   return possibleIdSum;
 };
 
-export default solve;
+export default async () => benchmarkSolve("Day 2 Puzzle 1", "Sum of game IDs where quantities are possible:", solve);
