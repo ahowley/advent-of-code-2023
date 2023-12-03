@@ -1,7 +1,7 @@
 import { benchmarkSolve, getLines } from "../util.js";
 
+export type PartNumber = { value: number; indeces: number[] };
 type TwoDimensionalIndex = { row: number; column: number };
-type PossiblePartNumber = { value: number; indeces: number[] };
 
 const isNumber = (character: string) => {
   if (character.length !== 1) throw new TypeError("isNumber expects a string with exactly 1 character.");
@@ -42,7 +42,7 @@ const getHorizontalAdjacentIndeces = (
   return indeces;
 };
 
-const getAdjacentIndeces = (lineLength: number, index: number, totalLength: number): number[] => {
+export const getAdjacentIndeces = (lineLength: number, index: number, totalLength: number): number[] => {
   const { row, column } = convert1dTo2dIndex(lineLength, index);
   const horizontalIndeces = getHorizontalAdjacentIndeces(lineLength, { row, column }, totalLength);
   const indecesAbove: TwoDimensionalIndex[] = [];
@@ -83,8 +83,8 @@ const getMultipleAdjacentIndeces = (lineLength: number, indeces: number[], total
   return Array.from(allAdjacentIndeces);
 };
 
-const getPossiblePartNumbers = (lineLength: number, entireString: string): PossiblePartNumber[] => {
-  const possiblePartNumbers: PossiblePartNumber[] = [];
+const getPossiblePartNumbers = (lineLength: number, entireString: string): PartNumber[] => {
+  const possiblePartNumbers: PartNumber[] = [];
   const { row: lastRow, column: lastColumn } = convert1dTo2dIndex(lineLength, entireString.length - 1);
 
   let numberProcessing = "";
@@ -107,7 +107,23 @@ const getPossiblePartNumbers = (lineLength: number, entireString: string): Possi
   return possiblePartNumbers;
 };
 
-const solve = async () => {
+export const getPartNumbers = (lineLength: number, entireString: string): PartNumber[] => {
+  const possiblePartNumbers = getPossiblePartNumbers(lineLength, entireString);
+  const partNumbers: PartNumber[] = [];
+  for (const partNumber of possiblePartNumbers) {
+    for (const adjacentIndex of getMultipleAdjacentIndeces(lineLength, partNumber.indeces, entireString.length)) {
+      const adjacentCharacter = entireString[adjacentIndex];
+      if (isSpecialCharacter(adjacentCharacter)) {
+        partNumbers.push(partNumber);
+        break;
+      }
+    }
+  }
+
+  return partNumbers;
+};
+
+export const getEntireStringAndLineLength = async (): Promise<[string, number]> => {
   const lines = getLines("day-3", "input.txt");
   let entireString = "";
   let lineLength = 0;
@@ -119,26 +135,14 @@ const solve = async () => {
     entireString += line;
   }
 
-  const possiblePartNumbers = getPossiblePartNumbers(lineLength, entireString);
-  const specialCharacterIndecesMemo = new Set<number>();
-  const validValues: number[] = [];
-  for (const { value, indeces } of possiblePartNumbers) {
-    for (const adjacentIndex of getMultipleAdjacentIndeces(lineLength, indeces, entireString.length)) {
-      if (specialCharacterIndecesMemo.has(adjacentIndex)) {
-        validValues.push(value);
-        break;
-      }
+  return [entireString, lineLength];
+};
 
-      const adjacentCharacter = entireString[adjacentIndex];
-      if (isSpecialCharacter(adjacentCharacter)) {
-        specialCharacterIndecesMemo.add(adjacentIndex);
-        validValues.push(value);
-        break;
-      }
-    }
-  }
+const solve = async () => {
+  const [entireString, lineLength] = await getEntireStringAndLineLength();
+  const partNumberValues = getPartNumbers(lineLength, entireString).map(({ value }) => value);
 
-  return validValues.reduce((a, c) => a + c, 0);
+  return partNumberValues.reduce((sum, current) => sum + current, 0);
 };
 
 export default () => benchmarkSolve("Day 3 Puzzle 1", "Sum of numbers adjacent to symbols:", solve);
