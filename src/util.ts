@@ -9,6 +9,8 @@ export async function* getLines(
   subdirectory: string,
   textFileName: TextFileName,
 ): AsyncGenerator<string, null, string> {
+  let totalIOTime = 0;
+  let start = performance.now();
   const src = dirname(fileURLToPath(import.meta.url));
   const directory = `${src}/${subdirectory}`;
   const filePath = `${directory}/${textFileName}`;
@@ -21,9 +23,12 @@ export async function* getLines(
 
   for await (const line of lineReader) {
     if (!line) continue;
+    totalIOTime += performance.now() - start;
     yield line;
+    start = performance.now();
   }
 
+  console.log("Read Time (ms):", totalIOTime);
   return null;
 }
 
