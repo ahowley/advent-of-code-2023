@@ -1,28 +1,31 @@
 import { benchmarkSolve } from "../util.js";
-import { getEntireStringAndLineLength, getPartNumbers, getAdjacentIndeces, PartNumber } from "./puzzle-1.js";
+import { getEntireStringAndLineLength, getPartNumbers, getMultipleAdjacentIndeces, PartNumber } from "./puzzle-1.js";
 
 type Gear = { index: number; adjacentPartNumbers: [PartNumber, PartNumber] };
+
+const getPartNumberAdjacencyMap = (lineLength: number, partNumbers: PartNumber[], entireString: string) => {
+  const adjacencyMap = new Map<number, PartNumber[]>();
+  for (const partNumber of partNumbers) {
+    for (const index of getMultipleAdjacentIndeces(lineLength, partNumber.indeces, entireString.length)) {
+      if (entireString[index] !== "*") continue;
+
+      const otherAdjacentPartNumbers = adjacencyMap.get(index) || [];
+      adjacencyMap.set(index, [...otherAdjacentPartNumbers, partNumber]);
+    }
+  }
+
+  return adjacencyMap;
+};
 
 const getGears = (lineLength: number, entireString: string, partNumbers: PartNumber[]): Gear[] => {
   const gears: Gear[] = [];
 
-  for (let i = 0; i < entireString.length; i++) {
-    const character = entireString[i];
-    if (character !== "*") continue;
-
-    const adjacentIndeces = getAdjacentIndeces(lineLength, i, entireString.length);
-    const adjacentPartNumbers: PartNumber[] = [];
-    for (const partNumber of partNumbers) {
-      if (adjacentPartNumbers.length > 2) break;
-      if (partNumber.indeces.some((index) => adjacentIndeces.includes(index))) {
-        adjacentPartNumbers.push(partNumber);
-      }
-    }
-
-    if (adjacentPartNumbers.length === 2) {
-      const [partNumber1, partNumber2] = adjacentPartNumbers;
-      gears.push({ index: i, adjacentPartNumbers: [partNumber1, partNumber2] });
-    }
+  for (const [index, adjacentPartNumbers] of getPartNumberAdjacencyMap(lineLength, partNumbers, entireString)) {
+    if (adjacentPartNumbers.length !== 2) continue;
+    gears.push({
+      index,
+      adjacentPartNumbers: [adjacentPartNumbers[0], adjacentPartNumbers[1]],
+    });
   }
 
   return gears;
@@ -43,4 +46,4 @@ const solve = async () => {
   return gears.reduce((sum, current) => sum + getGearRatio(current), 0);
 };
 
-export default () => benchmarkSolve("Day 3 Puzzle 2", "", solve);
+export default () => benchmarkSolve("Day 3 Puzzle 2", "Sum of gear ratios:", solve);

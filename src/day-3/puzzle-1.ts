@@ -42,7 +42,7 @@ const getHorizontalAdjacentIndeces = (
   return indeces;
 };
 
-export const getAdjacentIndeces = (lineLength: number, index: number, totalLength: number): number[] => {
+const getAdjacentIndeces = (lineLength: number, index: number, totalLength: number): number[] => {
   const { row, column } = convert1dTo2dIndex(lineLength, index);
   const horizontalIndeces = getHorizontalAdjacentIndeces(lineLength, { row, column }, totalLength);
   const indecesAbove: TwoDimensionalIndex[] = [];
@@ -70,7 +70,7 @@ export const getAdjacentIndeces = (lineLength: number, index: number, totalLengt
   ];
 };
 
-const getMultipleAdjacentIndeces = (lineLength: number, indeces: number[], totalLength: number): number[] => {
+export const getMultipleAdjacentIndeces = (lineLength: number, indeces: number[], totalLength: number): number[] => {
   const allAdjacentIndeces = new Set<number>();
   for (const index of indeces) {
     for (const adjacent of getAdjacentIndeces(lineLength, index, totalLength)) {
