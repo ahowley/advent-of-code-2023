@@ -21,7 +21,6 @@ const getGamePower = (game: Game) => {
 };
 
 const solve = async () => {
-  console.time("Day 2 Puzzle 2");
   const lines = getLines("day-2", "input.txt") as AsyncGenerator<InputString, null, InputString>;
 
   let sumOfPowers = 0;
