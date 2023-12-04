@@ -1,8 +1,8 @@
 import { benchmarkSolve, getLines } from "../util.js";
 
-type Scratchcard = { id: number; winningNumbers: number[]; numbers: number[] };
+export type Scratchcard = { id: number; winningNumbers: number[]; numbers: number[] };
 
-const parseCard = (scratchcardString: string): Scratchcard => {
+export const parseCard = (scratchcardString: string): Scratchcard => {
   scratchcardString = scratchcardString.replace(/ +/g, " ");
   const [idString, allNumbersString] = scratchcardString.split(": ");
   const id = parseInt(idString.split(" ")[1]);
