@@ -27,6 +27,8 @@ const getRaces = async (): Promise<Race[]> => {
   const linesIterator = getLines("day-6", "input.txt");
   const lines = [linesIterator.next(), linesIterator.next()];
   const [firstLine, secondLine] = (await Promise.all(lines)).map((result) => result.value.replace(/ +/g, " "));
+  linesIterator.next();
+
   const times = firstLine
     .slice("Time: ".length)
     .split(" ")

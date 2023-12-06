@@ -4,6 +4,8 @@ import { countWinningHoldTimes } from "./puzzle-1.js";
 const getRace = async () => {
   const linesIterator = getLines("day-6", "input.txt");
   const lines = [linesIterator.next(), linesIterator.next()];
+  linesIterator.next();
+
   const [firstLine, secondLine] = (await Promise.all(lines)).map((result) => result.value.replace(/ +/g, ""));
   const duration = parseInt(firstLine.slice("Time:".length));
   const distance = parseInt(secondLine.slice("Distance:".length));
