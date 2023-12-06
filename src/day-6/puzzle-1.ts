@@ -13,7 +13,7 @@ const quadraticFormula = (a: number, b: number, c: number) => {
   }
 };
 
-const countWinningHoldTimes = (race: Race) => {
+export const countWinningHoldTimes = (race: Race) => {
   const [min, max] = quadraticFormula(1, -race.duration, race.distance);
   if (min === undefined) return 0;
   if (max === undefined) return 1;
@@ -23,7 +23,7 @@ const countWinningHoldTimes = (race: Race) => {
   return Math.max(maxInt - minInt, 0);
 };
 
-const getRaces = async () => {
+const getRaces = async (): Promise<Race[]> => {
   const linesIterator = getLines("day-6", "input.txt");
   const lines = [linesIterator.next(), linesIterator.next()];
   const [firstLine, secondLine] = (await Promise.all(lines)).map((result) => result.value.replace(/ +/g, " "));

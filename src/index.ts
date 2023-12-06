@@ -9,6 +9,7 @@ import day4puzzle2 from "./day-4/puzzle-2.js";
 import day5puzzle1 from "./day-5/puzzle-1.js";
 import day5puzzle2 from "./day-5/puzzle-2.js";
 import day6puzzle1 from "./day-6/puzzle-1.js";
+import day6puzzle2 from "./day-6/puzzle-2.js";
 
 const solve = async () => {
   console.time("Total solve time");
@@ -23,6 +24,7 @@ const solve = async () => {
   await day5puzzle1();
   await day5puzzle2();
   await day6puzzle1();
+  await day6puzzle2();
   console.timeEnd("Total solve time");
 };
 
