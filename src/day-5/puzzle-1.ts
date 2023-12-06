@@ -1,54 +1,71 @@
 import { benchmarkSolve, getLines } from "../util.js";
 
-type IdMapFunction = (sourceNumber: number) => number;
+export type IdRange = {
+  min: number;
+  max: number;
+};
+
+export type IdMap = {
+  ranges: IdRange[];
+  get: (sourceNumber: number) => number;
+};
 
 type FoodMapName = `${string}-to-${string}`;
 
-type FoodMap = {
+export type FoodMap = {
   source: string;
   destination: string;
-  idMapFunction: IdMapFunction;
+  idMap: IdMap;
 };
 
 const parseSpaceSeparatedNumbers = (numberString: string) => {
   return numberString.split(" ").map((numberString) => parseInt(numberString));
 };
 
-const parseRangeToMapFunction = (rangeString: string): IdMapFunction => {
+const parseRangeToMap = (rangeString: string): IdMap => {
   const [destinationStart, sourceStart, rangeLength] = parseSpaceSeparatedNumbers(rangeString);
+  const sourceEnd = sourceStart + rangeLength - 1;
 
-  return (sourceNumber: number) => {
-    if (sourceNumber >= sourceStart + rangeLength || sourceNumber < sourceStart) {
-      return sourceNumber;
-    }
-
-    const offset = sourceNumber - sourceStart;
-    return destinationStart + offset;
-  };
-};
-
-const getFoodMap = (mapName: FoodMapName, mapFunctions: IdMapFunction[]): FoodMap => {
-  const [source, destination] = mapName.split("-to-");
   return {
-    source,
-    destination,
-    idMapFunction: (sourceNumber: number) => {
-      let destinationNumber = sourceNumber;
-      for (const idMapFunction of mapFunctions) {
-        destinationNumber = idMapFunction(sourceNumber);
-        if (destinationNumber !== sourceNumber) break;
+    ranges: [{ min: sourceStart, max: sourceEnd }],
+    get: (sourceNumber: number) => {
+      if (sourceNumber > sourceEnd || sourceNumber < sourceStart) {
+        return sourceNumber;
       }
 
-      return destinationNumber;
+      const offset = sourceNumber - sourceStart;
+      return destinationStart + offset;
     },
   };
 };
 
-const getSeedsAndFoodMaps = async (): Promise<[number[], Map<string, FoodMap>]> => {
+const getFoodMap = (mapName: FoodMapName, idMaps: IdMap[]): FoodMap => {
+  const [source, destination] = mapName.split("-to-");
+  const ranges = idMaps.map((idMap) => idMap.ranges[0]);
+
+  return {
+    source,
+    destination,
+    idMap: {
+      ranges: ranges,
+      get: (sourceNumber: number) => {
+        let destinationNumber = sourceNumber;
+        for (const idMap of idMaps) {
+          destinationNumber = idMap.get(sourceNumber);
+          if (destinationNumber !== sourceNumber) break;
+        }
+
+        return destinationNumber;
+      },
+    },
+  };
+};
+
+export const getSeedsAndFoodMaps = async (): Promise<[number[], Map<string, FoodMap>]> => {
   const lines = getLines("day-5", "input.txt");
 
   let currentMapParsing: "" | FoodMapName = "";
-  let currentMapFunctions: IdMapFunction[] = [];
+  let currentMapFunctions: IdMap[] = [];
   const seedsKey = "seeds: ";
   const seeds: number[] = [];
   const maps = new Map<string, FoodMap>();
@@ -73,7 +90,7 @@ const getSeedsAndFoodMaps = async (): Promise<[number[], Map<string, FoodMap>]> 
     }
 
     if (currentMapParsing) {
-      currentMapFunctions.push(parseRangeToMapFunction(line));
+      currentMapFunctions.push(parseRangeToMap(line));
     }
   }
   if (currentMapParsing && currentMapFunctions.length) {
@@ -90,7 +107,7 @@ const mapSeedsToDestination = (seeds: number[], maps: Map<string, FoodMap>, targ
     const foodMap = maps.get(source);
     if (!foodMap) throw new TypeError(`FoodMaps are missing source: ${source}`);
 
-    seeds = seeds.map((seed) => foodMap.idMapFunction(seed) || seed);
+    seeds = seeds.map((seed) => foodMap.idMap.get(seed) || seed);
     source = foodMap.destination;
   }
 
