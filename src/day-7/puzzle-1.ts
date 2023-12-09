@@ -1,13 +1,13 @@
 import { benchmarkSolve, getLines } from "../util.js";
 
-type CamelCardsGame = {
+export type CamelCardsGame = {
   hand: string;
   bid: number;
   consecutiveCards: string[];
   cardValues: number[];
 };
 
-const FACE_VALUES = new Map([
+export const FACE_VALUES = new Map([
   ["A", 14],
   ["K", 13],
   ["Q", 12],
@@ -48,9 +48,9 @@ const parseGame = (gameString: string): CamelCardsGame => {
 const getHandValue = (game: CamelCardsGame) => {
   const [group1, group2] = game.consecutiveCards;
 
-  if (!group1?.length) return HAND_VALUES.get("high card");
+  if (!group1) return HAND_VALUES.get("high card");
 
-  if (group2?.length) {
+  if (group2) {
     const maxLength = Math.max(group1.length, group2.length);
 
     if (maxLength === 3) return HAND_VALUES.get("full house");
@@ -78,7 +78,7 @@ const compareByHighCard = (game1: CamelCardsGame, game2: CamelCardsGame) => {
   return 0;
 };
 
-const compareGames = (game1: CamelCardsGame, game2: CamelCardsGame) => {
+export const compareGames = (game1: CamelCardsGame, game2: CamelCardsGame) => {
   const game1Value = getHandValue(game1);
   const game2Value = getHandValue(game2);
   const gameValueComparison = game1Value - game2Value;
