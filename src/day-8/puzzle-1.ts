@@ -1,11 +1,13 @@
 import { benchmarkSolve, getLines } from "../util.js";
 
-type Node = {
+export type Node = {
   L: string;
   R: string;
 };
 
-function* generateInstructions(instructionsOrder: string[]): Generator<string, void, string> {
+export type Instructions = Generator<string, void, string>;
+
+function* generateInstructions(instructionsOrder: string[]): Instructions {
   let currentIndex = 0;
 
   while (true) {
@@ -24,7 +26,7 @@ const parseNode = (inputString: string): [key: string, Node] => {
   return [key, { L, R }];
 };
 
-const solve = async () => {
+export const getInstructionsAndNodes = async () => {
   const lines = getLines("day-8", "input.txt");
   const instructionsOrder = [...(await lines.next()).value];
   const instructions = generateInstructions(instructionsOrder);
@@ -34,6 +36,12 @@ const solve = async () => {
     const [key, node] = parseNode(line);
     nodes.set(key, node);
   }
+
+  return [instructions, nodes] as [Instructions, Map<string, Node>];
+};
+
+const solve = async () => {
+  const [instructions, nodes] = await getInstructionsAndNodes();
 
   let numberOfSteps = 0;
   let currentKey = "AAA";

@@ -13,6 +13,7 @@ import day6puzzle2 from "./day-6/puzzle-2.js";
 import day7puzzle1 from "./day-7/puzzle-1.js";
 import day7puzzle2 from "./day-7/puzzle-2.js";
 import day8puzzle1 from "./day-8/puzzle-1.js";
+import day8puzzle2 from "./day-8/puzzle-2.js";
 
 const solve = async () => {
   console.time("Total solve time");
@@ -31,6 +32,7 @@ const solve = async () => {
   await day7puzzle1();
   await day7puzzle2();
   await day8puzzle1();
+  await day8puzzle2();
   console.timeEnd("Total solve time");
 };
 
